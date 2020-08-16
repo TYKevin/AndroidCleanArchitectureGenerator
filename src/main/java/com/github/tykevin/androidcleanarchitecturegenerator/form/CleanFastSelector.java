@@ -36,6 +36,9 @@ public class CleanFastSelector extends JPanel {
     private final BaseInfo baseInfo;
     private final ActionListener actionListener;
 
+    private JTextField txtParamName;
+    private JTextField txtComment;
+
     private JPanel buttonPanel;
     protected JButton btnConfirm;
     protected JButton btnCancel;
@@ -43,6 +46,7 @@ public class CleanFastSelector extends JPanel {
     protected PsiFile selectedRepostoryFile;
 
     protected ArrayList<ButtonModel> dsImplButtonModelList;
+
 
     public CleanFastSelector(Project project, Editor editor, BaseInfo baseInfo, ActionListener actionListener) {
         this.project = project;
@@ -63,16 +67,12 @@ public class CleanFastSelector extends JPanel {
     }
 
     private void addUseCaseInfo() {
-        JLabel labelUseCaseName = new JLabel();
-        labelUseCaseName.setText(baseInfo.useCasePsiClass.getName() + " 快速生成");
-        add(labelUseCaseName);
-
         JPanel panelComment = new JPanel();
         JLabel labelComment = new JLabel();
-        labelComment.setText("UseCase 的作用：");
+        labelComment.setText(baseInfo.useCasePsiClass.getName() + "的作用：");
         panelComment.add(labelComment);
 
-        JTextField txtComment = new JTextField(5);
+        txtComment = new JTextField(5);
         txtComment.setToolTipText(baseInfo.useCasePsiClass.getName() + "的作用（将用作方法注释）");
         panelComment.add(txtComment);
         add(panelComment);
@@ -98,7 +98,7 @@ public class CleanFastSelector extends JPanel {
         labelParamType.setText(baseInfo.paramPsiClass != null ? baseInfo.paramPsiClass.getName() : "");
         panelParamType.add(labelParamType);
 
-        JTextField txtParamName = new JTextField(5);
+        txtParamName = new JTextField(5);
         txtParamName.setText(baseInfo.paramPsiClass != null ? ClassNameUtils.subClassNameToFuncName(baseInfo.paramPsiClass.getName()) : "");
         panelParamType.add(txtParamName);
         add(panelParamType);
@@ -533,15 +533,19 @@ public class CleanFastSelector extends JPanel {
     protected class ConfirmAction extends AbstractAction {
 
         public void actionPerformed(ActionEvent event) {
-            if (baseInfo.dataStoreImplClassesMap == null) {
+            baseInfo.comment = txtComment.getText();
+            if (baseInfo.comment == null
+                    || baseInfo.comment.length() <= 0) {
+                MessageUtils.showErrorMsg(project, "请输入方法注释");
                 return;
             }
 
-            for (PsiClass dataSourceImplClass : baseInfo.dataStoreImplClassesMap.keySet()) {
-                log.debug(dataSourceImplClass.getName() + " 是否选中：" + baseInfo.dataStoreImplClassesMap.get(dataSourceImplClass));
+            baseInfo.paramFieldName = txtParamName.getText();
+            if (baseInfo.paramFieldName == null
+                    || baseInfo.paramFieldName.length() <= 0) {
+                baseInfo.paramFieldName = ClassNameUtils.subClassNameToFuncName(baseInfo.paramPsiClass.getName());
             }
 
-            closeDialog();
             if (actionListener != null) {
                 actionListener.onConfirmAction(baseInfo);
             }

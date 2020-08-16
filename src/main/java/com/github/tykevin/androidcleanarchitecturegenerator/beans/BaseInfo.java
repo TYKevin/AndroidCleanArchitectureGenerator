@@ -2,7 +2,6 @@ package com.github.tykevin.androidcleanarchitecturegenerator.beans;
 
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiType;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -10,13 +9,20 @@ import java.util.Map;
 
 public class BaseInfo {
 
+    /**
+     * Usecase 注释
+     */
+    public String comment;
+
+    /**
+     * 入参名称，支持自定义，输入框为空则使用默认
+     */
+    public String paramFieldName;
+
     // UseCase PsiClass
     public PsiClass useCasePsiClass;
 
-    // 出入参 的 PsiType
-    public PsiType returnType;
-    public PsiType paramType;
-
+    // 出入参 的 PsiClass
     public PsiClass returnPsiClass;
     public PsiClass paramPsiClass;
 
@@ -58,9 +64,16 @@ public class BaseInfo {
     public String toString() {
         return "BaseInfo{" +
                 "useCasePsiClass=" + useCasePsiClass.getName() +
-                ", returnType=" + returnType.getCanonicalText() +
-                ", paramType=" + paramType.getCanonicalText() +
                 ", repositoryInterfaceFiles=" + Arrays.toString(repositoryInterfaceFiles) +
                 '}';
+    }
+
+    public boolean isNoParam() {
+        if (paramPsiClass == null) {
+            return false;
+        }
+
+        String repositoryParamType = this.paramPsiClass.getQualifiedName();
+        return "java.lang.Void".equals(repositoryParamType);
     }
 }

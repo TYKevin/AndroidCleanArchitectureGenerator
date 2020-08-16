@@ -3,6 +3,7 @@ package com.github.tykevin.androidcleanarchitecturegenerator.acion;
 import com.github.tykevin.androidcleanarchitecturegenerator.beans.BaseInfo;
 import com.github.tykevin.androidcleanarchitecturegenerator.form.CleanFastSelector;
 import com.github.tykevin.androidcleanarchitecturegenerator.utils.FileUtils;
+import com.github.tykevin.androidcleanarchitecturegenerator.utils.GenerateCodeUtils;
 import com.github.tykevin.androidcleanarchitecturegenerator.utils.MessageUtils;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -20,14 +21,16 @@ import java.util.Map;
 
 public class CleanArchFast extends AnAction {
     private static final Logger log = Logger.getInstance(CleanArchFast.class);
+    private Project project;
+    private Editor editor;
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         log.setLevel(Level.ALL);
         log.info("===== CleanArchFast Plugin working =======");
 
-        Project project = e.getData(PlatformDataKeys.PROJECT);
-        Editor editor = e.getData(PlatformDataKeys.EDITOR);
+        project = e.getData(PlatformDataKeys.PROJECT);
+        editor = e.getData(PlatformDataKeys.EDITOR);
         PsiElement psiElement = e.getData(LangDataKeys.PSI_ELEMENT);
         //如果光标选择的不是类，弹出对话框提醒
         if (psiElement == null || !(psiElement instanceof PsiClass)) {
@@ -40,18 +43,34 @@ public class CleanArchFast extends AnAction {
         BaseInfo baseInfo = getBaseInfo(project, editor, useCasePsiClass);
         log.info(baseInfo.toString());
 
+
+        if (baseInfo.paramPsiClass == null
+                || baseInfo.returnPsiClass == null
+        ) {
+            MessageUtils.showErrorMsg(project, "出入参准备错误！");
+        }
+
+        if (baseInfo.repositoryInterfaceFiles == null) {
+            log.error("getRepositoryFileList 错误：repositoryInterfaceFiles == null");
+            MessageUtils.showErrorMsg(project, "repositoryInterfaceFiles 准备错误！");
+            return;
+        }
+
         // 展示选择框
         CleanFastSelector.showSelectorDialog(project, editor, baseInfo, new CleanFastSelector.ActionListener() {
             @Override
             public void onConfirmAction(BaseInfo info) {
-
+                generateGreatCode(info);
             }
 
             @Override
             public void onCancelAction() {
-
             }
         });
+    }
+
+    private void generateGreatCode(BaseInfo info) {
+        GenerateCodeUtils.generatorUseCaseCode(project, info);
     }
 
     private BaseInfo getBaseInfo(Project project, Editor editor, PsiClass useCasePsiClass) {
@@ -80,11 +99,6 @@ public class CleanArchFast extends AnAction {
         }
 
         PsiFile[] repositoryInterfaceFiles = FileUtils.getRepositoryInterfaces(project, editor);
-        if (repositoryInterfaceFiles == null) {
-            log.error("getRepositoryFileList 错误：repositoryInterfaceFiles == null");
-            return;
-        }
-        log.info("repositoryInterfaceFiles.length = " + repositoryInterfaceFiles.length);
         baseInfo.repositoryInterfaceFiles = repositoryInterfaceFiles;
     }
 
@@ -116,10 +130,7 @@ public class CleanArchFast extends AnAction {
         log.info("returnType 名：" + returnType.getCanonicalText());
         log.info("paramType 名：" + paramType.getCanonicalText());
 
-        baseInfo.paramType = paramType;
         baseInfo.paramPsiClass = PsiTypesUtil.getPsiClass(paramType);
-
-        baseInfo.returnType = returnType;
         baseInfo.returnPsiClass = PsiTypesUtil.getPsiClass(returnType);
     }
 
