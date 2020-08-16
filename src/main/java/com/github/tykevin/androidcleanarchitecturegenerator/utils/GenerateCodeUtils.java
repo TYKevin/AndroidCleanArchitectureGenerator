@@ -1,11 +1,13 @@
 package com.github.tykevin.androidcleanarchitecturegenerator.utils;
 
+import com.github.tykevin.androidcleanarchitecturegenerator.acion.utils.Utils;
 import com.github.tykevin.androidcleanarchitecturegenerator.beans.BaseInfo;
 import com.github.tykevin.androidcleanarchitecturegenerator.beans.DataStoreImplInfo;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElementFactory;
@@ -182,7 +184,7 @@ public class GenerateCodeUtils {
 
 
     /**
-     * 在 DataStore 实现类中 添加方法实现
+     * 在 DataStore 实现类中 根据选择创建不同的实现
      *
      * @param project
      * @param baseInfo
@@ -204,6 +206,14 @@ public class GenerateCodeUtils {
         });
     }
 
+    /**
+     * 在 DataStore 实现类中 添加方法实现
+     * @param project
+     * @param mFactory
+     * @param dataStoreImplClass
+     * @param dataStoreImplInfo
+     * @param baseInfo
+     */
     private static void toGeneratorDataStoreImplImplCode(Project project, PsiElementFactory mFactory, PsiClass dataStoreImplClass, DataStoreImplInfo dataStoreImplInfo, BaseInfo baseInfo) {
         PsiClass returnClass = baseInfo.returnPsiClass;
         PsiClass paramClass = baseInfo.paramPsiClass;
@@ -213,7 +223,6 @@ public class GenerateCodeUtils {
 
         String repositoryReturnClassName = returnClass.getQualifiedName();
         String repositoryParamClassName = paramClass.getQualifiedName();
-
 
         StringBuilder method = new StringBuilder();
         method.append("@Override\n");
@@ -238,7 +247,139 @@ public class GenerateCodeUtils {
         styleManager.optimizeImports(dataStoreImplClass.getContainingFile());
         styleManager.shortenClassReferences(dataStoreImplClass);
         new ReformatCodeProcessor(project, dataStoreImplClass.getContainingFile(), null, false).runWithoutProgress();
+
+        // 如果需要DataSource 模板代码生成，则根据需要进行生成
+        if (dataStoreImplInfo.isNeedGenerate) {
+            toGeneratorDataSourceCode(project, mFactory, dataStoreImplClass, dataStoreImplInfo, baseInfo);
+            generatorDataSourceImplCode(project, mFactory, dataStoreImplClass, dataStoreImplInfo, baseInfo);
+        }
     }
 
+    /**
+     * DataSource(例如：CashDB，CashApi) 接口 定义方法
+     *
+     * @param project
+     * @param mFactory
+     * @param dataStoreImplClass
+     * @param dataStoreImplInfo
+     * @param baseInfo
+     */
+    private static void toGeneratorDataSourceCode(Project project, PsiElementFactory mFactory, PsiClass dataStoreImplClass, DataStoreImplInfo dataStoreImplInfo, BaseInfo baseInfo){
+        ApplicationManager.getApplication().invokeLater(() -> {
+            WriteCommandAction.runWriteCommandAction(project, () -> {
+                PsiClass dataSourceInterface = dataStoreImplInfo.generateDataSourceInterface;
+
+                PsiClass returnClass = baseInfo.returnPsiClass;
+                PsiClass paramClass = baseInfo.paramPsiClass;
+                String comment = baseInfo.comment;
+                String repositoryFuncName = baseInfo.getUseCaseActionFuncName();
+                String paramFieldName = baseInfo.getParamFieldName();
+
+                String repositoryReturnClassName = returnClass.getQualifiedName();
+                String repositoryParamClassName = paramClass.getQualifiedName();
+
+
+                if (dataStoreImplInfo.generateType == DataStoreImplInfo.GenerateType.NET) {
+                    StringBuilder urlStringBuilder = new StringBuilder();
+                    urlStringBuilder.append("/**\n");
+                    urlStringBuilder.append(" * " + comment + "\n");
+                    urlStringBuilder.append(" */\n");
+                    urlStringBuilder.append("String ").append(baseInfo.getApiUrlName()).append(" = com.qianmi.arch.config.Hosts.URL_HOST").append("+\"\";");
+                    dataSourceInterface.add(mFactory.createFieldFromText(urlStringBuilder.toString(), dataSourceInterface));
+                }
+
+
+                StringBuilder method = new StringBuilder();
+                method.append("/**\n");
+                method.append(" * " + comment + "\n");
+                method.append(" */\n");
+                method.append("io.reactivex.Observable<" + repositoryReturnClassName + "> " + repositoryFuncName + "(");
+                if (!baseInfo.isVoidParam()) {
+                    method.append(repositoryParamClassName + " " + paramFieldName);
+                }
+                method.append(");");
+                dataSourceInterface.add(mFactory.createMethodFromText(method.toString(), dataSourceInterface));
+
+                JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(project);
+                styleManager.optimizeImports(dataSourceInterface.getContainingFile());
+                styleManager.shortenClassReferences(dataSourceInterface);
+                new ReformatCodeProcessor(project, dataSourceInterface.getContainingFile(), null, false).runWithoutProgress();
+            });
+        });
+    }
+
+    /**
+     * DataSource(例如：CashDB，CashApi) 接口 找到实现类，每个实现类，生成模板方法
+     *
+     * @param project
+     * @param mFactory
+     * @param dataStoreImplClass
+     * @param dataStoreImplInfo
+     * @param baseInfo
+     */
+    private static void generatorDataSourceImplCode(Project project, PsiElementFactory mFactory, PsiClass dataStoreImplClass, DataStoreImplInfo dataStoreImplInfo, BaseInfo baseInfo){
+        PsiClass dataSourceInterface = dataStoreImplInfo.generateDataSourceInterface;
+        PsiClass[] dataSourceImplClasses = Utils.getImplClasses(dataSourceInterface);
+        if (dataSourceImplClasses == null || dataSourceImplClasses.length <= 0) {
+            Messages.showMessageDialog(project, "未找到 " + dataStoreImplInfo.generateDataSourceInterface.getName() + " 实现类", "错误", null);
+            return;
+        }
+
+        for (PsiClass dataSourceImplClass : dataSourceImplClasses) {
+            toGeneratorDataSourceImplCode(project, mFactory, dataSourceImplClass, dataStoreImplInfo, baseInfo);
+        }
+    }
+
+    /**
+     * DataSource(例如：CashDB，CashApi) 的实现类 生成对定的模板方法
+     *
+     * @param project
+     * @param mFactory
+     * @param dataSourceImplClass
+     * @param dataStoreImplInfo
+     * @param baseInfo
+     */
+    private static void toGeneratorDataSourceImplCode(Project project, PsiElementFactory mFactory, PsiClass dataSourceImplClass, DataStoreImplInfo dataStoreImplInfo, BaseInfo baseInfo){
+        ApplicationManager.getApplication().invokeLater(() -> {
+            WriteCommandAction.runWriteCommandAction(project, () -> {
+
+
+                PsiClass returnClass = baseInfo.returnPsiClass;
+                PsiClass paramClass = baseInfo.paramPsiClass;
+                String repositoryFuncName = baseInfo.getUseCaseActionFuncName();
+                String paramFieldName = baseInfo.getParamFieldName();
+                String dataStoreFieldName = baseInfo.dataStoreFieldName;
+
+                String repositoryReturnClassName = returnClass.getQualifiedName();
+                String repositoryParamClassName = paramClass.getQualifiedName();
+
+
+                StringBuilder method = new StringBuilder();
+                method.append("@Override\n");
+                method.append("public io.reactivex.Observable<" + repositoryReturnClassName + "> " + repositoryFuncName + "(");
+                if (!baseInfo.isVoidParam()) {
+                    method.append(repositoryParamClassName + " " + paramFieldName);
+                }
+                method.append("){");
+
+                // 方法内容
+                method.append("  return io.reactivex.Observable.create(emitter -> {\n");
+
+                String templateCode = GenerateTemplateCodeUtils.getTemplateCode(dataSourceImplClass, dataStoreImplInfo, baseInfo);
+                if (templateCode != null) {
+                    method.append(templateCode);
+                }
+
+                method.append("});");
+                method.append("}");
+                dataSourceImplClass.add(mFactory.createMethodFromText(method.toString(), dataSourceImplClass));
+
+                JavaCodeStyleManager styleManager = JavaCodeStyleManager.getInstance(project);
+                styleManager.optimizeImports(dataSourceImplClass.getContainingFile());
+                styleManager.shortenClassReferences(dataSourceImplClass);
+                new ReformatCodeProcessor(project, dataSourceImplClass.getContainingFile(), null, false).runWithoutProgress();
+            });
+        });
+    }
 
 }

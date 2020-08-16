@@ -1,5 +1,6 @@
 package com.github.tykevin.androidcleanarchitecturegenerator.beans;
 
+import com.github.tykevin.androidcleanarchitecturegenerator.utils.ClassNameUtils;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 
@@ -97,5 +98,13 @@ public class BaseInfo {
         }
 
         return subClassNameToFuncName(this.useCasePsiClass.getName());
+    }
+
+    public String getApiUrlName() {
+        if (dataStoreFieldName == null) {
+            return "";
+        }
+
+        return ClassNameUtils.humpToUnderline(dataStoreFieldName) + "_URL";
     }
 }
