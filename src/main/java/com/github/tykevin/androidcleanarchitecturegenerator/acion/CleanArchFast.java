@@ -71,6 +71,10 @@ public class CleanArchFast extends AnAction {
 
     private void generateGreatCode(BaseInfo info) {
         GenerateCodeUtils.generatorUseCaseCode(project, info);
+        GenerateCodeUtils.generatorRepositoryCode(project, info);
+        GenerateCodeUtils.generatorRepositoryImplCode(project, info);
+        GenerateCodeUtils.generatorDataStoreCode(project, info);
+        GenerateCodeUtils.generatorDataStoreImplCode(project, info);
     }
 
     private BaseInfo getBaseInfo(Project project, Editor editor, PsiClass useCasePsiClass) {

@@ -223,6 +223,7 @@ public class CleanFastSelector extends JPanel {
                     }
 
                     log.info("selectedDataStore = " + fieldName);
+                    baseInfo.dataStoreFieldName = fieldName;
                     baseInfo.dataStoreInterface = baseInfo.repostoryFieldMap.get(fieldName);
                     if (baseInfo.dataStoreInterface == null) {
                         MessageUtils.showErrorMsg(project, "没有找到DataSource PsiClass");
@@ -332,7 +333,8 @@ public class CleanFastSelector extends JPanel {
                 private void dataStoreImplHandler(final DataStoreImplInfo dataStoreImplInfo, JCheckBox cbDataStroreImpl, PsiClass dataStoreImplClass) {
                     dataStoreImplInfo.isNeedGenerate = cbDataStroreImpl.isSelected();
                     if (!dataStoreImplInfo.isNeedGenerate) {
-                        dataStoreImplInfo.generateInterface = null;
+                        dataStoreImplInfo.generateDataSourceInterface = null;
+                        dataStoreImplInfo.generateInterfaceFieldName = null;
                         dataStoreImplInfo.generateType = null;
                         addOrRefreshGenerateTips();
                     } else {
@@ -347,7 +349,8 @@ public class CleanFastSelector extends JPanel {
                                     @Override
                                     public void onCancelAction() {
                                         dataStoreImplInfo.isNeedGenerate = false;
-                                        dataStoreImplInfo.generateInterface = null;
+                                        dataStoreImplInfo.generateDataSourceInterface = null;
+                                        dataStoreImplInfo.generateInterfaceFieldName = null;
                                         dataStoreImplInfo.generateType = null;
                                         cbDataStroreImpl.setSelected(false);
                                         addOrRefreshGenerateTips();
@@ -408,8 +411,8 @@ public class CleanFastSelector extends JPanel {
             }
 
             stringBuilder.append("在 ");
-            if (dataStoreImplInfo.generateInterface != null) {
-                stringBuilder. append(dataStoreImplInfo.generateInterface.getName());
+            if (dataStoreImplInfo.generateDataSourceInterface != null) {
+                stringBuilder. append(dataStoreImplInfo.generateDataSourceInterface.getName());
             }
 
             stringBuilder.append(" 中生成");
@@ -417,7 +420,7 @@ public class CleanFastSelector extends JPanel {
                 stringBuilder.append(dataStoreImplInfo.generateType.desc);
             }
 
-            stringBuilder.append("的模板代码; \n");
+            stringBuilder.append("数据的模板代码; \n");
             labelTips.setText(stringBuilder.toString());
             panelDsGenerateTips.add(labelTips);
         }

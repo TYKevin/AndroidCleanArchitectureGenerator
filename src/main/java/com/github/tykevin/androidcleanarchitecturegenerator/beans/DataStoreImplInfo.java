@@ -4,14 +4,16 @@ import com.intellij.psi.PsiClass;
 
 public class DataStoreImplInfo {
     public boolean isNeedGenerate;
-    public PsiClass generateInterface;
+    public PsiClass generateDataSourceInterface;
+
+    public String generateInterfaceFieldName;
     public GenerateType generateType;
 
     @Override
     public String toString() {
         return "DataStoreImplInfo{" +
                 "isNeedGenerate=" + isNeedGenerate +
-                ", generateInterface=" + generateInterface +
+                ", generateInterface=" + generateDataSourceInterface +
                 ", generateType=" + generateType +
                 '}';
     }

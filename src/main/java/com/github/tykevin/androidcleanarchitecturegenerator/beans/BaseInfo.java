@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.github.tykevin.androidcleanarchitecturegenerator.utils.ClassNameUtils.subClassNameToFuncName;
+
 public class BaseInfo {
 
     /**
@@ -44,6 +46,10 @@ public class BaseInfo {
      * dataStore 的 interface
      */
     public PsiClass dataStoreInterface;
+    /**
+     * 选中的 dataStore 的属性名
+     */
+    public String dataStoreFieldName;
 
     /**
      * dataStore 的 实现类，以及其中需要生成 DataSource 模板代码的相关信息
@@ -60,6 +66,7 @@ public class BaseInfo {
      */
    public Map<String, PsiClass> repostoryFieldMap;
 
+
     @Override
     public String toString() {
         return "BaseInfo{" +
@@ -68,12 +75,27 @@ public class BaseInfo {
                 '}';
     }
 
-    public boolean isNoParam() {
+    public boolean isVoidParam() {
         if (paramPsiClass == null) {
             return false;
         }
 
         String repositoryParamType = this.paramPsiClass.getQualifiedName();
         return "java.lang.Void".equals(repositoryParamType);
+    }
+
+    public String getParamFieldName() {
+        if (isVoidParam()) {
+           return "";
+        }
+
+        return paramFieldName;
+    }
+    public String getUseCaseActionFuncName() {
+        if (useCasePsiClass == null) {
+            return  "";
+        }
+
+        return subClassNameToFuncName(this.useCasePsiClass.getName());
     }
 }

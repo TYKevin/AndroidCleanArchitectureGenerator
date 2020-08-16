@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class DataSourceGenerateSelector extends JPanel {
     private static final Logger log = Logger.getInstance(DataSourceGenerateSelector.class);
@@ -121,7 +122,7 @@ public class DataSourceGenerateSelector extends JPanel {
             return;
         }
 
-       ArrayList<PsiClass> datasourceFieldList = new ArrayList<>();
+        LinkedHashMap<String,PsiClass> datasourceFieldMap = new LinkedHashMap<>();
         for (PsiField datasourceImplFields : datasourceFields) {
             log.info("datasourceImplFields = " + datasourceImplFields.getName());
             PsiClass fieldClass = PsiTypesUtil.getPsiClass(datasourceImplFields.getType());
@@ -138,7 +139,7 @@ public class DataSourceGenerateSelector extends JPanel {
             boolean isDataSourceRef =
                     (fieldClassKind == JvmClassKind.INTERFACE);
             if (isDataSourceRef) {
-                datasourceFieldList.add(fieldClass);
+                datasourceFieldMap.put(datasourceImplFields.getName(), fieldClass);
             }
         }
 
@@ -154,8 +155,9 @@ public class DataSourceGenerateSelector extends JPanel {
         int cnt = 0;
         ButtonGroup group = new ButtonGroup();
         ArrayList<ButtonModel> radioButtonModelList = new ArrayList<>();
-        for (PsiClass psiClass : datasourceFieldList) {
-            JRadioButton rbInterface = new JRadioButton(psiClass.getName());
+        for (String fieldName : datasourceFieldMap.keySet()) {
+            PsiClass dataSourceInterface = datasourceFieldMap.get(fieldName);
+            JRadioButton rbInterface = new JRadioButton(dataSourceInterface.getName() + " " + fieldName);
             group.add(rbInterface);
             panelInterfaceList.add(rbInterface);
 
@@ -165,9 +167,9 @@ public class DataSourceGenerateSelector extends JPanel {
                     if (!rbInterface.isSelected()) {
                         return;
                     }
-
-                    log.info("selected data source interface = " + psiClass.getName());
-                    dataStoreImplInfo.generateInterface = psiClass;
+                    log.info("selected data source interface = " + dataSourceInterface.getName() );
+                    dataStoreImplInfo.generateInterfaceFieldName = fieldName;
+                    dataStoreImplInfo.generateDataSourceInterface = dataSourceInterface;
                 }
             });
 
