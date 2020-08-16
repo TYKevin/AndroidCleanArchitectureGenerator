@@ -8,12 +8,6 @@
     <depends>com.intellij.modules.platform</depends>
 
     <actions>
-        <action id="GenerateGroup.CleanClearFast"
-                class="com.github.tykevin.androidcleanarchitecturegenerator.acion.CleanClearFast"
-                text="CleanClearFast" description="Android Clean Arch Generator">
-            <add-to-group group-id="GenerateGroup" anchor="last"/>
-        </action>
-
         <action id="GenerateGroup.CleanArchFast"
                 class="com.github.tykevin.androidcleanarchitecturegenerator.acion.CleanArchFast"
                 text="CleanArchFast" description="Android Clean Arch fast generator">

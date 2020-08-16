@@ -1,6 +1,5 @@
 package com.github.tykevin.androidcleanarchitecturegenerator.utils;
 
-import com.github.tykevin.androidcleanarchitecturegenerator.acion.utils.Utils;
 import com.github.tykevin.androidcleanarchitecturegenerator.beans.BaseInfo;
 import com.github.tykevin.androidcleanarchitecturegenerator.beans.DataStoreImplInfo;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
@@ -307,7 +306,7 @@ public class GenerateCodeUtils {
      */
     private static void generatorDataSourceImplCode(Project project, PsiElementFactory mFactory, PsiClass dataStoreImplClass, DataStoreImplInfo dataStoreImplInfo, BaseInfo baseInfo){
         PsiClass dataSourceInterface = dataStoreImplInfo.generateDataSourceInterface;
-        PsiClass[] dataSourceImplClasses = Utils.getImplClasses(dataSourceInterface);
+        PsiClass[] dataSourceImplClasses = FileUtils.getImplClasses(dataSourceInterface);
         if (dataSourceImplClasses == null || dataSourceImplClasses.length <= 0) {
             Messages.showMessageDialog(project, "未找到 " + dataStoreImplInfo.generateDataSourceInterface.getName() + " 实现类", "错误", null);
             return;

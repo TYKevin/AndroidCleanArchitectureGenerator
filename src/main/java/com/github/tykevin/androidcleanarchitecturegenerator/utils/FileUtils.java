@@ -1,13 +1,22 @@
 package com.github.tykevin.androidcleanarchitecturegenerator.utils;
 
+import com.intellij.ide.util.PsiClassListCellRenderer;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.search.PsiElementProcessor;
+import com.intellij.psi.search.PsiElementProcessorAdapter;
+import com.intellij.psi.search.searches.ClassInheritorsSearch;
 import com.intellij.psi.util.PsiUtilBase;
+import gnu.trove.THashSet;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class FileUtils {
     private static final Logger log = Logger.getInstance(FileUtils.class);
@@ -86,6 +95,31 @@ public class FileUtils {
         }
         return null;
     }
+
+    /**
+     * 查找实现类
+     * @param repositoryClass
+     * @return
+     */
+    public static PsiClass[] getImplClasses(PsiClass repositoryClass) {
+        PsiElementProcessor.CollectElementsWithLimit<PsiClass> processor = new PsiElementProcessor.CollectElementsWithLimit<>(5, new THashSet<>());
+        ClassInheritorsSearch.search(repositoryClass).forEach(new PsiElementProcessorAdapter<>(processor));
+
+        if (processor.isOverflow()) {
+            return null;
+        }
+
+        PsiClass[] subclasses = processor.toArray(PsiClass.EMPTY_ARRAY);
+        if (subclasses.length == 0) {
+            return null;
+        }
+
+        Comparator<PsiClass> comparator = new PsiClassListCellRenderer().getComparator();
+        Arrays.sort(subclasses, comparator);
+
+        return subclasses;
+    }
+
 
 
 }

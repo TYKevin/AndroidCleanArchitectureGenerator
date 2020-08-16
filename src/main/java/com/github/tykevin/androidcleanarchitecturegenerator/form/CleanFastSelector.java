@@ -1,10 +1,10 @@
 package com.github.tykevin.androidcleanarchitecturegenerator.form;
 
 import com.github.tykevin.androidcleanarchitecturegenerator.acion.CleanArchFast;
-import com.github.tykevin.androidcleanarchitecturegenerator.acion.utils.Utils;
 import com.github.tykevin.androidcleanarchitecturegenerator.beans.BaseInfo;
 import com.github.tykevin.androidcleanarchitecturegenerator.beans.DataStoreImplInfo;
 import com.github.tykevin.androidcleanarchitecturegenerator.utils.ClassNameUtils;
+import com.github.tykevin.androidcleanarchitecturegenerator.utils.FileUtils;
 import com.github.tykevin.androidcleanarchitecturegenerator.utils.MessageUtils;
 import com.intellij.lang.jvm.JvmClassKind;
 import com.intellij.openapi.diagnostic.Logger;
@@ -281,7 +281,7 @@ public class CleanFastSelector extends JPanel {
 
 
         //  获取接口实现类
-        PsiClass[] dataStoreImplClasses = Utils.getImplClasses(baseInfo.dataStoreInterface);
+        PsiClass[] dataStoreImplClasses = FileUtils.getImplClasses(baseInfo.dataStoreInterface);
         if (dataStoreImplClasses == null || dataStoreImplClasses.length <= 0) {
             Messages.showMessageDialog(project, "未找到 DataStore 实现类", "错误", null);
             return;
@@ -469,7 +469,7 @@ public class CleanFastSelector extends JPanel {
 
     public Map<String, PsiClass> getDataStoreFieldMap(PsiClass repositoryInterface) {
         //  获取接口实现类
-        PsiClass[] repostoryImplClasses = Utils.getImplClasses(repositoryInterface);
+        PsiClass[] repostoryImplClasses = FileUtils.getImplClasses(repositoryInterface);
         if (repostoryImplClasses == null || repostoryImplClasses.length <= 0) {
             Messages.showMessageDialog(project, "未找到 repostory 实现类", "错误", null);
             return null;
