@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public class CleanArchFast extends AnAction {
-    private static final Logger log = Logger.getInstance(CleanClearFast.class);
+    private static final Logger log = Logger.getInstance(CleanArchFast.class);
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
@@ -40,6 +40,18 @@ public class CleanArchFast extends AnAction {
         BaseInfo baseInfo = getBaseInfo(project, editor, useCasePsiClass);
         log.info(baseInfo.toString());
 
+        // 展示选择框
+        CleanFastSelector.showSelectorDialog(project, editor, baseInfo, new CleanFastSelector.ActionListener() {
+            @Override
+            public void onConfirmAction(BaseInfo info) {
+
+            }
+
+            @Override
+            public void onCancelAction() {
+
+            }
+        });
     }
 
     private BaseInfo getBaseInfo(Project project, Editor editor, PsiClass useCasePsiClass) {
@@ -51,9 +63,6 @@ public class CleanArchFast extends AnAction {
 
         // domain/repository 下找到 所有的 interface files
         setRepositoryFileList(project, editor, baseInfo);
-
-        // 展示选择框
-        CleanFastSelector.showSelectorDialog(project, editor, baseInfo);
 
         return baseInfo;
     }
