@@ -46,6 +46,10 @@ public class CleanArchFast extends AnAction {
 
         if (baseInfo.paramPsiClass == null
                 || baseInfo.returnPsiClass == null
+                || baseInfo.paramPsiClassFullName == null
+                || baseInfo.paramPsiClassFullName.length()  == 0
+                || baseInfo.returnPsiClassFullName == null
+                || baseInfo.returnPsiClassFullName.length()  == 0
         ) {
             MessageUtils.showErrorMsg(project, "出入参准备错误！");
         }
@@ -61,6 +65,7 @@ public class CleanArchFast extends AnAction {
             @Override
             public void onConfirmAction(BaseInfo info) {
                 generateGreatCode(info);
+                CleanFastSelector.closeDialog();
             }
 
             @Override
@@ -119,7 +124,12 @@ public class CleanArchFast extends AnAction {
 
         PsiType returnType = null;
         PsiType paramType = null;
-        PsiClassType base = useCasePsiClass.getExtendsListTypes()[0];
+        PsiClassType[]  basePsiClassTypes = useCasePsiClass.getExtendsListTypes();
+        if(basePsiClassTypes == null || basePsiClassTypes.length < 1) {
+            MessageUtils.showErrorMsg(project, "未检测到对应出参或入参的泛型列表！");
+            return;
+        }
+        PsiClassType base = basePsiClassTypes[0];
         PsiTypeParameter[] psiTypeParameters = base.resolve().getTypeParameters();
         Map<PsiTypeParameter, PsiType> map = base.resolveGenerics().getSubstitutor().getSubstitutionMap();
         if (psiTypeParameters.length >= 2 && map != null) {
@@ -135,7 +145,10 @@ public class CleanArchFast extends AnAction {
         log.info("paramType 名：" + paramType.getCanonicalText());
 
         baseInfo.paramPsiClass = PsiTypesUtil.getPsiClass(paramType);
+        baseInfo.paramPsiClassFullName = paramType.getCanonicalText();
+
         baseInfo.returnPsiClass = PsiTypesUtil.getPsiClass(returnType);
+        baseInfo.returnPsiClassFullName = returnType.getCanonicalText();
     }
 
 

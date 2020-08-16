@@ -84,7 +84,7 @@ public class CleanFastSelector extends JPanel {
         panelReturnType.add(labelReturnTypeTitle);
 
         JLabel labelReturnType = new JLabel();
-        labelReturnType.setText(baseInfo.returnPsiClass != null ? baseInfo.returnPsiClass.getName() : "");
+        labelReturnType.setText(baseInfo.returnPsiClassFullName);
         panelReturnType.add(labelReturnType);
         add(panelReturnType);
 
@@ -95,7 +95,7 @@ public class CleanFastSelector extends JPanel {
         panelParamType.add(labelParamTypeTitle);
 
         JLabel labelParamType = new JLabel();
-        labelParamType.setText(baseInfo.paramPsiClass != null ? baseInfo.paramPsiClass.getName() : "");
+        labelParamType.setText(baseInfo.paramPsiClassFullName);
         panelParamType.add(labelParamType);
 
         txtParamName = new JTextField(5);
@@ -523,7 +523,7 @@ public class CleanFastSelector extends JPanel {
     }
 
 
-    protected void closeDialog() {
+    public static void closeDialog() {
         if (mDialog == null) {
             return;
         }

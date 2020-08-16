@@ -21,8 +21,6 @@ public class GenerateCodeUtils {
             WriteCommandAction.runWriteCommandAction(mProject, () -> {
                 PsiClass useCaseClass = baseInfo.useCasePsiClass;
                 PsiClass repositoryClass = baseInfo.repositoryInterface;
-                PsiClass returnClass = baseInfo.returnPsiClass;
-                PsiClass paramClass = baseInfo.paramPsiClass;
                 String paramFieldName = baseInfo.getParamFieldName();
 
                 PsiElementFactory mFactory = JavaPsiFacade.getElementFactory(mProject);
@@ -36,9 +34,9 @@ public class GenerateCodeUtils {
                 useCaseClass.add(mFactory.createMethodFromText(method.toString(), useCaseClass));
 
                 String repositoryFunc = baseInfo.getUseCaseActionFuncName();
-                String repositoryReturnType = returnClass.getQualifiedName();
-                String repositoryParamType = paramClass.getQualifiedName();
-                String repositoryFuncParamName = baseInfo.isVoidParam() ? "v" : paramFieldName;
+                String repositoryReturnType = baseInfo.returnPsiClassFullName;
+                String repositoryParamType = baseInfo.paramPsiClassFullName;
+                String repositoryFuncParamName = baseInfo.getParamFieldName();
 
                 StringBuilder methodBuildUseCase = new StringBuilder();
                 methodBuildUseCase.append("@Override\n");
@@ -68,14 +66,12 @@ public class GenerateCodeUtils {
                 PsiElementFactory mFactory = JavaPsiFacade.getElementFactory(project);
 
                 PsiClass repositoryInterface = baseInfo.repositoryInterface;
-                PsiClass returnClass = baseInfo.returnPsiClass;
-                PsiClass paramClass = baseInfo.paramPsiClass;
                 String comment = baseInfo.comment;
                 String repositoryFuncName = baseInfo.getUseCaseActionFuncName();
                 String paramFieldName = baseInfo.getParamFieldName();
 
-                String repositoryReturnClassName = returnClass.getQualifiedName();
-                String repositoryParamClassName = paramClass.getQualifiedName();
+                String repositoryReturnClassName = baseInfo.returnPsiClassFullName;
+                String repositoryParamClassName = baseInfo.paramPsiClassFullName;
 
                 StringBuilder method = new StringBuilder();
                 method.append("/**\n");
@@ -109,14 +105,12 @@ public class GenerateCodeUtils {
                 PsiClass repositoryImplClass = baseInfo.repostoryImplClass;
 
 
-                PsiClass returnClass = baseInfo.returnPsiClass;
-                PsiClass paramClass = baseInfo.paramPsiClass;
                 String repositoryFuncName = baseInfo.getUseCaseActionFuncName();
                 String paramFieldName = baseInfo.getParamFieldName();
                 String dataStoreFieldName = baseInfo.dataStoreFieldName;
 
-                String repositoryReturnClassName = returnClass.getQualifiedName();
-                String repositoryParamClassName = paramClass.getQualifiedName();
+                String repositoryReturnClassName = baseInfo.returnPsiClassFullName;
+                String repositoryParamClassName = baseInfo.paramPsiClassFullName;
 
 
                 StringBuilder method = new StringBuilder();
@@ -154,14 +148,12 @@ public class GenerateCodeUtils {
                 PsiElementFactory mFactory = JavaPsiFacade.getElementFactory(project);
 
                 PsiClass dataStoreInterface = baseInfo.dataStoreInterface;
-                PsiClass returnClass = baseInfo.returnPsiClass;
-                PsiClass paramClass = baseInfo.paramPsiClass;
                 String comment = baseInfo.comment;
                 String repositoryFuncName = baseInfo.getUseCaseActionFuncName();
                 String paramFieldName = baseInfo.getParamFieldName();
 
-                String repositoryReturnClassName = returnClass.getQualifiedName();
-                String repositoryParamClassName = paramClass.getQualifiedName();
+                String repositoryReturnClassName = baseInfo.returnPsiClassFullName;
+                String repositoryParamClassName = baseInfo.paramPsiClassFullName;
 
                 StringBuilder method = new StringBuilder();
                 method.append("/**\n");
@@ -215,14 +207,12 @@ public class GenerateCodeUtils {
      * @param baseInfo
      */
     private static void toGeneratorDataStoreImplImplCode(Project project, PsiElementFactory mFactory, PsiClass dataStoreImplClass, DataStoreImplInfo dataStoreImplInfo, BaseInfo baseInfo) {
-        PsiClass returnClass = baseInfo.returnPsiClass;
-        PsiClass paramClass = baseInfo.paramPsiClass;
         String repositoryFuncName = baseInfo.getUseCaseActionFuncName();
         String paramFieldName = baseInfo.getParamFieldName();
         String dataSourceFieldName = dataStoreImplInfo.generateInterfaceFieldName;
 
-        String repositoryReturnClassName = returnClass.getQualifiedName();
-        String repositoryParamClassName = paramClass.getQualifiedName();
+        String repositoryReturnClassName = baseInfo.returnPsiClassFullName;
+        String repositoryParamClassName = baseInfo.paramPsiClassFullName;
 
         StringBuilder method = new StringBuilder();
         method.append("@Override\n");
@@ -269,14 +259,12 @@ public class GenerateCodeUtils {
             WriteCommandAction.runWriteCommandAction(project, () -> {
                 PsiClass dataSourceInterface = dataStoreImplInfo.generateDataSourceInterface;
 
-                PsiClass returnClass = baseInfo.returnPsiClass;
-                PsiClass paramClass = baseInfo.paramPsiClass;
                 String comment = baseInfo.comment;
                 String repositoryFuncName = baseInfo.getUseCaseActionFuncName();
                 String paramFieldName = baseInfo.getParamFieldName();
 
-                String repositoryReturnClassName = returnClass.getQualifiedName();
-                String repositoryParamClassName = paramClass.getQualifiedName();
+                String repositoryReturnClassName = baseInfo.returnPsiClassFullName;
+                String repositoryParamClassName = baseInfo.paramPsiClassFullName;
 
 
                 if (dataStoreImplInfo.generateType == DataStoreImplInfo.GenerateType.NET) {
@@ -344,14 +332,12 @@ public class GenerateCodeUtils {
             WriteCommandAction.runWriteCommandAction(project, () -> {
 
 
-                PsiClass returnClass = baseInfo.returnPsiClass;
-                PsiClass paramClass = baseInfo.paramPsiClass;
                 String repositoryFuncName = baseInfo.getUseCaseActionFuncName();
                 String paramFieldName = baseInfo.getParamFieldName();
                 String dataStoreFieldName = baseInfo.dataStoreFieldName;
 
-                String repositoryReturnClassName = returnClass.getQualifiedName();
-                String repositoryParamClassName = paramClass.getQualifiedName();
+                String repositoryReturnClassName = baseInfo.returnPsiClassFullName;
+                String repositoryParamClassName = baseInfo.paramPsiClassFullName;
 
 
                 StringBuilder method = new StringBuilder();

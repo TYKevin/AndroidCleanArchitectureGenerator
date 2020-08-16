@@ -27,7 +27,10 @@ public class BaseInfo {
 
     // 出入参 的 PsiClass
     public PsiClass returnPsiClass;
+    public String returnPsiClassFullName;
+
     public PsiClass paramPsiClass;
+    public String paramPsiClassFullName;
 
     /**
      * domain/repository 下找到 所有的 interface files
